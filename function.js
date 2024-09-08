@@ -31,9 +31,12 @@ $(document).ready(function() {
         var currentTask = $(this); 
         var currentTitle = currentTask.find('.task-title').text();
         var currentDescription = currentTask.find('.task-description').text();
+        var currentDueDate = currentTask.find('.task-due-date-display').text();
     
         $('#taskTitleContent').val(currentTitle);
         $('#taskDescriptionContent').val(currentDescription);
+        console.log(currentDueDate);
+        convertDate(currentDueDate);
     
         setupSaveButton(true, currentTask);
 
@@ -76,6 +79,16 @@ $(document).ready(function() {
         else
             $('#emptyPlaceHolder').hide();
     }
+
+    function convertDate(displayDate) {
+        let date = new Date(displayDate);
+        let month = ("0" + (date.getMonth() + 1)).slice(-2);
+        let day = ("0" + date.getDate().slice(-2));
+        let year = date.getFullYear();
+        let formattedDate = '${month}/${day}/${year}';
+        $('#taskDueDate').val("setDate", formattedDate);
+    }
+
 
     function setupSaveButton(isEditMode, currentTask) {
         $('#saveTaskBtn').off('click').on('click', function() {

@@ -25,7 +25,7 @@
             <p class="task-description"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
 
             <div class="task-due-date" id="displayDueDate">
-                <p>September 9, 2024</p>
+                <p class="task-due-date-display">September 9, 2024</p>
             </div>
         </div>
     </div>
