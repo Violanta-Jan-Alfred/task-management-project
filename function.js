@@ -82,11 +82,11 @@ $(document).ready(function() {
 
     function convertDate(displayDate) {
         let date = new Date(displayDate);
-        let month = ("0" + (date.getMonth() + 1)).slice(-2);
-        let day = ("0" + date.getDate().slice(-2));
+        let month = (date.getMonth() + 1).toString().padStart(2, '0');
+        let day = date.getDate().toString().padStart(2, '0');
         let year = date.getFullYear();
-        let formattedDate = '${month}/${day}/${year}';
-        $('#taskDueDate').val("setDate", formattedDate);
+        let formattedDate = `${year}-${month}-${day}`;
+        $('#taskDueDate').val(formattedDate);
     }
 
 
