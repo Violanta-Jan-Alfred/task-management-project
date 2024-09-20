@@ -36,7 +36,7 @@
     <div class="background-overlay" id="backgroundOverlay"></div>
 
     <div id="popupForm" class="form-popup">
-        <form action="db-connection.php" class="form-container">
+        <form action="db-connection.php" class="form-container" method="POST">
             <br>
             <h2 align="center" id="formTitle">
                 Create A Task
@@ -47,7 +47,8 @@
                 Task Title
             </label>
             <br>
-            <input type="text" 
+            <input type="text"
+                    name="task_name"
                     placeholder="Enter Task Title" 
                     id="taskTitleContent" 
                     required
@@ -60,6 +61,7 @@
             </label>
             <textarea 
                     placeholder="Enter Task Description" 
+                    name="task_description"
                     id="taskDescriptionContent"
                     required
                     autocomplete="off"></textarea>
@@ -69,12 +71,13 @@
                 Set Due Date~
             </label>
             <br>
-            <input type="date" id="taskDueDate" required>
+            <input type="date" id="taskDueDate" name="due_date" required>
 
-            <button type="button" class="btn-save" id="saveTaskBtn">Save</button>
+            <button type="submit" class="btn-save" 
+            name="save"  id="saveTaskBtn">Save</button>
 
             <span class="button-container">
-                <button type="button" class="btn-delete" id="deleteTaskBtn">
+                <button type="button" name="delete" class="btn-delete" id="deleteTaskBtn">
                     <i class="material-icons">delete</i>
                 </button>
 
