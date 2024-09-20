@@ -46,12 +46,33 @@ body {
     z-index: 0;
 }
 
+.task-checkbox {
+    width: 30px; 
+    height: 30px; 
+    border-radius: 25px;
+    cursor: pointer; 
+    margin-right: 10px;
+    margin-left: 10px;
+    flex: 0 0 auto; 
+}
+
+.task-content {
+    display: flex;
+    flex-direction: column; 
+    flex-grow: 1; 
+    min-width: 0; 
+}
+
 .task {
-    position: relative;
+    position: relative; 
+    display: flex;
+    align-items: center;
     background-color: white;
     border-radius: 12px;
     transition: background-color 0.2s ease-in-out;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 10px; 
+    overflow: hidden; 
 }
 
 .task:hover {
@@ -63,6 +84,10 @@ body {
 .task-title {
     font-size: 1.5em;
     padding-left: 15px;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 70%;
 }
 
 .task-description {
@@ -71,7 +96,12 @@ body {
     padding-bottom: 5px;
     max-height: 3em;
     overflow: hidden;
+    text-overflow: ellipsis; 
+    display: -webkit-box; 
+    -webkit-box-orient: vertical; 
+    -webkit-line-clamp: 3; 
 }
+
 
 .task-due-date {
     display: inline-block;
