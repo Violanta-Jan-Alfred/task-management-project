@@ -15,29 +15,21 @@ $(document).ready(function() {
         hideOverlays();
     });
 
-    $('.task-due-date').on('mouseenter', function() {
-
-    }).on('mouseleave', function() {
-        
-    });
-
-
     $(document).on('click', '.task', function() {
         $('#backgroundOverlay').show();
         $('#popupForm').show();
         $('#formTitle').text('Edit Task');
         $('#deleteTaskBtn').show();
-    
+
         var currentTask = $(this); 
         var currentTitle = currentTask.find('.task-title').text();
         var currentDescription = currentTask.find('.task-description').text();
         var currentDueDate = currentTask.find('.task-due-date-display').text();
-    
+
         $('#taskTitleContent').val(currentTitle);
         $('#taskDescriptionContent').val(currentDescription);
-        console.log(currentDueDate);
         convertDate(currentDueDate);
-    
+
         setupSaveButton(true, currentTask);
 
         $('#deleteTaskBtn').off('click').on('click', function() {
@@ -107,22 +99,21 @@ $(document).ready(function() {
                     if (currentTask) {
                         currentTask.find('.task-title').text(taskTitle);
                         currentTask.find('.task-description').text(taskDescription);
-                        currentTask.find('.task-due-date p').text(formattedDate);
+                        currentTask.find('.task-due-date-display').text(formattedDate);
                     }
                 } else {
-                    var newTask = $(
-                        '<div class="task">' +
-                            '<h2 class="task-title">' + taskTitle + '</h2>' +
-                            '<p class="task-description">' + taskDescription + '</p>' +
-                            '<div class="task-due-date" id="displayDueDate">' +
-                                '<p>' + formattedDate + '</p>' +
-                            '</div>' +
-                        '</div>'
-                    );
+                    var newTask = $(`
+                        <div class="task">
+                            <h2 class="task-title">${taskTitle}</h2>
+                            <p class="task-description">${taskDescription}</p>
+                            <div class="task-due-date" id="displayDueDate">
+                                <p class="task-due-date-display">${formattedDate}</p>
+                            </div>
+                        </div>
+                    `);
     
                     $('.recycler-view').append(newTask);
                 }
-    
                 clearFields();
                 hideOverlays();
             }
