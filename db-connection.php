@@ -4,18 +4,14 @@
     $password = "";
     $db_name = "task_management_db";
 
-    // Establish database connection
     $connection = mysqli_connect($server_name, $username, $password, $db_name);
 
-    // Check for connection failure
     if (!$connection) {
         die("Connection failed: " . mysqli_connect_error());
     } else {
-        // TESTING
         echo "Connected successfully<br>";
     }
 
-    // SAVE TASK API
     function saveTask($connection) {
         
         if (isset($_POST['taskTitleContent']) && isset($_POST['taskDescriptionContent']) && isset($_POST['taskDueDate'])) {

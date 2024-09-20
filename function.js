@@ -8,7 +8,6 @@ $(document).ready(function() {
         $('#deleteTaskBtn').hide();
         clearFields();
         setupSaveButton(false, null);
-
     });
 
     $('#closeFormBtn').on('click', function() {
@@ -42,12 +41,18 @@ $(document).ready(function() {
                 currentTask.remove();
             
             hideOverlays();
+            sortByDate();
         });
 
         $("#noDeleteBtn").off('click').on('click', function() {
             $('#deleteBackgroundOverlay').hide();
             $('#deleteConfirmation').hide();
         });
+    });
+
+        
+    $(document).on('click', '.task-checkbox', function(event) {
+        event.stopPropagation(); 
     });
     
     function clearFields() {
@@ -104,25 +109,35 @@ $(document).ready(function() {
                 } else {
                     var newTask = $(`
                         <div class="task">
-                            <h2 class="task-title">${taskTitle}</h2>
-                            <p class="task-description">${taskDescription}</p>
-                            <div class="task-due-date" id="displayDueDate">
-                                <p class="task-due-date-display">${formattedDate}</p>
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <h2 class="task-title">${taskTitle}</h2>
+                                <p class="task-description">${taskDescription}</p>
+                                <div class="task-due-date" id="displayDueDate">
+                                    <p class="task-due-date-display">${formattedDate}</p>
+                                </div>
                             </div>
                         </div>
                     `);
-    
                     $('.recycler-view').append(newTask);
                 }
                 clearFields();
                 hideOverlays();
             }
+            sortByDate();
         });
-    }
-
-
     
 
+        function sortByDate() {
+            var tasks = $('.task').get();
+            tasks.sort(function(a, b) {
+                var dateA = new Date($(a).find('.task-due-date-display').text());
+                var dateB = new Date($(b).find('.task-due-date-display').text());
+                return dateA - dateB;  
+            });
+            $('.recycler-view').empty().append(tasks);
+        }
+    }
 });
 
 
