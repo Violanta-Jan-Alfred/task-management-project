@@ -59,4 +59,4 @@ if (isset($_GET['delete id'])) {
     //Call all task for display
 
     $result = mysqli_query($connection, "SELECT * FROM tblTask");
-    ?>-
+    ?>
