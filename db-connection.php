@@ -31,7 +31,6 @@
                     echo "Error creating task: " . $stmt->error;
                 }
 
-                // Close the statement
                 $stmt->close();
             } else {
                 echo "Error preparing the SQL statement: " . $connection->error;
