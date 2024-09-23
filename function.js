@@ -8,36 +8,27 @@ $(document).ready(function() {
         $('#deleteTaskBtn').hide();
         clearFields();
         setupSaveButton(false, null);
-
     });
 
     $('#closeFormBtn').on('click', function() {
         hideOverlays();
     });
 
-    $('.task-due-date').on('mouseenter', function() {
-
-    }).on('mouseleave', function() {
-        
-    });
-
-
     $(document).on('click', '.task', function() {
         $('#backgroundOverlay').show();
         $('#popupForm').show();
         $('#formTitle').text('Edit Task');
         $('#deleteTaskBtn').show();
-    
+
         var currentTask = $(this); 
         var currentTitle = currentTask.find('.task-title').text();
         var currentDescription = currentTask.find('.task-description').text();
         var currentDueDate = currentTask.find('.task-due-date-display').text();
-    
+
         $('#taskTitleContent').val(currentTitle);
         $('#taskDescriptionContent').val(currentDescription);
-        console.log(currentDueDate);
         convertDate(currentDueDate);
-    
+
         setupSaveButton(true, currentTask);
 
         $('#deleteTaskBtn').off('click').on('click', function() {
@@ -50,12 +41,18 @@ $(document).ready(function() {
                 currentTask.remove();
             
             hideOverlays();
+            sortByDate();
         });
 
         $("#noDeleteBtn").off('click').on('click', function() {
             $('#deleteBackgroundOverlay').hide();
             $('#deleteConfirmation').hide();
         });
+    });
+
+        
+    $(document).on('click', '.task-checkbox', function(event) {
+        event.stopPropagation(); 
     });
     
     function clearFields() {
@@ -82,11 +79,11 @@ $(document).ready(function() {
 
     function convertDate(displayDate) {
         let date = new Date(displayDate);
-        let month = ("0" + (date.getMonth() + 1)).slice(-2);
-        let day = ("0" + date.getDate().slice(-2));
+        let month = (date.getMonth() + 1).toString().padStart(2, '0');
+        let day = date.getDate().toString().padStart(2, '0');
         let year = date.getFullYear();
-        let formattedDate = '${month}/${day}/${year}';
-        $('#taskDueDate').val("setDate", formattedDate);
+        let formattedDate = `${year}-${month}-${day}`;
+        $('#taskDueDate').val(formattedDate);
     }
 
 
@@ -107,26 +104,39 @@ $(document).ready(function() {
                     if (currentTask) {
                         currentTask.find('.task-title').text(taskTitle);
                         currentTask.find('.task-description').text(taskDescription);
-                        currentTask.find('.task-due-date p').text(formattedDate);
+                        currentTask.find('.task-due-date-display').text(formattedDate);
                     }
                 } else {
-                    var newTask = $(
-                        '<div class="task">' +
-                            '<h2 class="task-title">' + taskTitle + '</h2>' +
-                            '<p class="task-description">' + taskDescription + '</p>' +
-                            '<div class="task-due-date" id="displayDueDate">' +
-                                '<p>' + formattedDate + '</p>' +
-                            '</div>' +
-                        '</div>'
-                    );
-    
+                    var newTask = $(`
+                        <div class="task">
+                            <input type="checkbox" class="task-checkbox">
+                            <div class="task-content">
+                                <h2 class="task-title">${taskTitle}</h2>
+                                <p class="task-description">${taskDescription}</p>
+                                <div class="task-due-date" id="displayDueDate">
+                                    <p class="task-due-date-display">${formattedDate}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `);
                     $('.recycler-view').append(newTask);
                 }
-    
                 clearFields();
                 hideOverlays();
             }
+            sortByDate();
         });
+    
+
+        function sortByDate() {
+            var tasks = $('.task').get();
+            tasks.sort(function(a, b) {
+                var dateA = new Date($(a).find('.task-due-date-display').text());
+                var dateB = new Date($(b).find('.task-due-date-display').text());
+                return dateA - dateB;  
+            });
+            $('.recycler-view').empty().append(tasks);
+        }
     }
 });
 
