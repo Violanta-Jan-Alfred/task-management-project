@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    checkForTasksAvailable();
+    loadTasks();
 
     $('#openFormBtn').on('click', function() {
         $('#backgroundOverlay').show();
@@ -30,7 +30,6 @@ $(document).ready(function() {
         convertDate(currentDueDate);
 
         setupSaveButton(true, currentTask);
-
         $('#deleteTaskBtn').off('click').on('click', function() {
             $('#deleteBackgroundOverlay').show();
             $('#deleteConfirmation').show();
@@ -92,7 +91,6 @@ $(document).ready(function() {
             var taskTitle = $('#taskTitleContent').val();
             var taskDescription = $('#taskDescriptionContent').val();
             var taskDueDate = $('#taskDueDate').val(); 
-    
             if (taskTitle && taskDescription && taskDueDate) {
                 var formattedDate = new Date(taskDueDate).toLocaleDateString('en-US', {
                     month: 'long',
@@ -105,14 +103,61 @@ $(document).ready(function() {
                         currentTask.find('.task-title').text(taskTitle);
                         currentTask.find('.task-description').text(taskDescription);
                         currentTask.find('.task-due-date-display').text(formattedDate);
+
+
                     }
                 } else {
+                    console.log("I add here");
+                    $.ajax({
+                        url: 'submit_task.php', 
+                        method: 'POST',
+                        data: {
+                            task_title: taskTitle,
+                            task_description: taskDescription,
+                            task_due_date: taskDueDate,
+                            is_edit: isEditMode, 
+                        },
+                        success: function(response) {
+                            hideOverlays(); 
+                        }
+                    });
+                }
+                clearFields();
+                hideOverlays();
+            }
+            sortByDate();
+        });
+    }
+
+    function sortByDate() {
+        var tasks = $('.task').get();
+        tasks.sort(function(a, b) {
+            var dateA = new Date($(a).find('.task-due-date-display').text());
+            var dateB = new Date($(b).find('.task-due-date-display').text());
+            return dateA - dateB;  
+        });
+        $('.recycler-view').empty().append(tasks);
+    }
+
+    function loadTasks() {
+        $.ajax({
+            url: 'load_tasks.php',
+            method: 'GET',
+            success: function (response) {
+                const tasks = JSON.parse(response);
+                tasks.forEach(task => {
+                    var formattedDate = new Date(task.due_date).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
+                    });
+
                     var newTask = $(`
                         <div class="task">
-                            <input type="checkbox" class="task-checkbox">
+                            <input type="checkbox" class="task-checkbox" ${task.status === 1 ? 'checked' : ''}>
                             <div class="task-content">
-                                <h2 class="task-title">${taskTitle}</h2>
-                                <p class="task-description">${taskDescription}</p>
+                                <h2 class="task-title">${task.task_title}</h2>
+                                <p class="task-description">${task.task_description}</p>
                                 <div class="task-due-date" id="displayDueDate">
                                     <p class="task-due-date-display">${formattedDate}</p>
                                 </div>
@@ -120,27 +165,16 @@ $(document).ready(function() {
                         </div>
                     `);
                     $('.recycler-view').append(newTask);
-                }
-                clearFields();
-                hideOverlays();
+                });
+
+                checkForTasksAvailable();
+                sortByDate();
+            },
+            error: function (xhr, status, error) {
+                console.error("Failed to load tasks: ", error);
             }
-            sortByDate();
         });
-    
-
-        function sortByDate() {
-            var tasks = $('.task').get();
-            tasks.sort(function(a, b) {
-                var dateA = new Date($(a).find('.task-due-date-display').text());
-                var dateB = new Date($(b).find('.task-due-date-display').text());
-                return dateA - dateB;  
-            });
-            $('.recycler-view').empty().append(tasks);
-        }
     }
+
+    
 });
-
-
-
-
-
