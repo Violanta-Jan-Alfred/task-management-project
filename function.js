@@ -36,11 +36,29 @@ $(document).ready(function() {
         });
     
         $("#yesDeleteBtn").off('click').on('click', function() {
-            if (currentTask) 
-                currentTask.remove();
-            
-            hideOverlays();
-            sortByDate();
+            if (currentTask) {
+                var taskTitle = currentTask.find('.task-title').text(); 
+        
+                $.ajax({
+                    url: 'delete_task.php',
+                    method: 'POST',
+                    data: {
+                        task_title: taskTitle 
+                    },
+                    success: function(response) {
+                        if (response === "success") {
+                            currentTask.remove(); 
+                            hideOverlays();
+                            sortByDate();
+                        } else {
+                            console.error("Failed to delete task from the database.");
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error occurred while deleting task: ", error);
+                    }
+                });
+            }
         });
 
         $("#noDeleteBtn").off('click').on('click', function() {
@@ -90,7 +108,8 @@ $(document).ready(function() {
         $('#saveTaskBtn').off('click').on('click', function() {
             var taskTitle = $('#taskTitleContent').val();
             var taskDescription = $('#taskDescriptionContent').val();
-            var taskDueDate = $('#taskDueDate').val(); 
+            var taskDueDate = $('#taskDueDate').val();
+    
             if (taskTitle && taskDescription && taskDueDate) {
                 var formattedDate = new Date(taskDueDate).toLocaleDateString('en-US', {
                     month: 'long',
@@ -100,14 +119,34 @@ $(document).ready(function() {
     
                 if (isEditMode) {
                     if (currentTask) {
-                        currentTask.find('.task-title').text(taskTitle);
-                        currentTask.find('.task-description').text(taskDescription);
-                        currentTask.find('.task-due-date-display').text(formattedDate);
-
-
+                        var oldTitle = currentTask.find('.task-title').text(); 
+                        
+                        $.ajax({
+                            url: 'update_task.php', 
+                            method: 'POST',
+                            data: {
+                                old_task_title: oldTitle,  
+                                task_title: taskTitle, 
+                                task_description: taskDescription, 
+                                task_due_date: taskDueDate 
+                            },
+                            success: function(response) {
+                                if (response === 'success') {
+                                    currentTask.find('.task-title').text(taskTitle);
+                                    currentTask.find('.task-description').text(taskDescription);
+                                    currentTask.find('.task-due-date-display').text(formattedDate);
+                                    hideOverlays();
+                                    sortByDate();
+                                } else {
+                                    console.error("Failed to update task in the database.");
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error("Error occurred while updating task: ", error);
+                            }
+                        });
                     }
                 } else {
-                    console.log("I add here");
                     $.ajax({
                         url: 'submit_task.php', 
                         method: 'POST',
@@ -128,6 +167,7 @@ $(document).ready(function() {
             sortByDate();
         });
     }
+    
 
     function sortByDate() {
         var tasks = $('.task').get();
@@ -138,6 +178,7 @@ $(document).ready(function() {
         });
         $('.recycler-view').empty().append(tasks);
     }
+
 
     function loadTasks() {
         $.ajax({
@@ -154,7 +195,7 @@ $(document).ready(function() {
 
                     var newTask = $(`
                         <div class="task">
-                            <input type="checkbox" class="task-checkbox" ${task.status === 1 ? 'checked' : ''}>
+                            <input type="checkbox" class="task-checkbox" ${Number(task.status) === 1 ? 'checked' : ''}>
                             <div class="task-content">
                                 <h2 class="task-title">${task.task_title}</h2>
                                 <p class="task-description">${task.task_description}</p>
@@ -164,6 +205,7 @@ $(document).ready(function() {
                             </div>
                         </div>
                     `);
+                    
                     $('.recycler-view').append(newTask);
                 });
 
@@ -175,6 +217,4 @@ $(document).ready(function() {
             }
         });
     }
-
-    
 });
