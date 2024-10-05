@@ -14,6 +14,7 @@ $(document).ready(function() {
         hideOverlays();
     });
 
+    //delete function
     $(document).on('click', '.task', function() {
         $('#backgroundOverlay').show();
         $('#popupForm').show();
@@ -71,6 +72,33 @@ $(document).ready(function() {
     $(document).on('click', '.task-checkbox', function(event) {
         event.stopPropagation(); 
     });
+
+    //checkbox
+    $(document).on('change', '.task-checkbox', function() {
+        var currentTask = $(this).closest('.task'); 
+        var taskTitle = currentTask.find('.task-title').text(); 
+        var isChecked = $(this).is(':checked'); 
+    
+        $.ajax({
+            url: 'update_task_status.php', 
+            method: 'POST',
+            data: {
+                task_title: taskTitle, 
+                status: isChecked ? 1 : 0 
+            },
+            success: function(response) {
+                if (response === 'success') {
+                    console.log('Task status updated successfully.');
+                } else {
+                    console.error('Failed to update task status.');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error occurred while updating task status: ', error);
+            }
+        });
+    });
+    
     
     function clearFields() {
         $('#taskTitleContent').val('');
@@ -104,6 +132,7 @@ $(document).ready(function() {
     }
 
 
+    //for setting up updating and adding
     function setupSaveButton(isEditMode, currentTask) {
         $('#saveTaskBtn').off('click').on('click', function() {
             var taskTitle = $('#taskTitleContent').val();
@@ -116,7 +145,7 @@ $(document).ready(function() {
                     day: 'numeric',
                     year: 'numeric'
                 });
-    
+                //for updating a task
                 if (isEditMode) {
                     if (currentTask) {
                         var oldTitle = currentTask.find('.task-title').text(); 
@@ -146,7 +175,9 @@ $(document).ready(function() {
                             }
                         });
                     }
-                } else {
+                } 
+                //for adding
+                else {
                     $.ajax({
                         url: 'submit_task.php', 
                         method: 'POST',
@@ -180,6 +211,7 @@ $(document).ready(function() {
     }
 
 
+    //read
     function loadTasks() {
         $.ajax({
             url: 'load_tasks.php',
