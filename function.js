@@ -51,12 +51,7 @@ $(document).ready(function() {
                             currentTask.remove(); 
                             hideOverlays();
                             sortByDate();
-                        } else {
-                            console.error("Failed to delete task from the database.");
                         }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Error occurred while deleting task: ", error);
                     }
                 });
             }
@@ -73,7 +68,7 @@ $(document).ready(function() {
         event.stopPropagation(); 
     });
 
-    //checkbox
+    //checkbox | part of update
     $(document).on('change', '.task-checkbox', function() {
         var currentTask = $(this).closest('.task'); 
         var taskTitle = currentTask.find('.task-title').text(); 
@@ -87,14 +82,7 @@ $(document).ready(function() {
                 status: isChecked ? 1 : 0 
             },
             success: function(response) {
-                if (response === 'success') {
-                    console.log('Task status updated successfully.');
-                } else {
-                    console.error('Failed to update task status.');
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error occurred while updating task status: ', error);
+                loadTasks();
             }
         });
     });
@@ -166,12 +154,7 @@ $(document).ready(function() {
                                     currentTask.find('.task-due-date-display').text(formattedDate);
                                     hideOverlays();
                                     sortByDate();
-                                } else {
-                                    console.error("Failed to update task in the database.");
                                 }
-                            },
-                            error: function(xhr, status, error) {
-                                console.error("Error occurred while updating task: ", error);
                             }
                         });
                     }
@@ -195,6 +178,7 @@ $(document).ready(function() {
                 clearFields();
                 hideOverlays();
             }
+            loadTasks();
             sortByDate();
         });
     }
@@ -202,21 +186,34 @@ $(document).ready(function() {
 
     function sortByDate() {
         var tasks = $('.task').get();
+        
         tasks.sort(function(a, b) {
-            var dateA = new Date($(a).find('.task-due-date-display').text());
-            var dateB = new Date($(b).find('.task-due-date-display').text());
-            return dateA - dateB;  
+            var dateA = $(a).find('.task-due-date-display').text().trim();
+            var dateB = $(b).find('.task-due-date-display').text().trim();
+    
+            if (dateA === "DONE!" && dateB !== "DONE!") {
+                return 1; 
+            } else if (dateB === "DONE!" && dateA !== "DONE!") {
+                return -1; 
+            }
+    
+            var parsedDateA = new Date(dateA);
+            var parsedDateB = new Date(dateB);
+    
+            return parsedDateA - parsedDateB;
         });
+    
         $('.recycler-view').empty().append(tasks);
     }
-
-
+    
     //read
     function loadTasks() {
         $.ajax({
             url: 'load_tasks.php',
             method: 'GET',
             success: function (response) {
+                $('.recycler-view').empty();
+    
                 const tasks = JSON.parse(response);
                 tasks.forEach(task => {
                     var formattedDate = new Date(task.due_date).toLocaleDateString('en-US', {
@@ -224,28 +221,55 @@ $(document).ready(function() {
                         day: 'numeric',
                         year: 'numeric'
                     });
-
+    
+                    var titleClass = Number(task.status) === 1 ? 'completed' : '';
+    
                     var newTask = $(`
                         <div class="task">
                             <input type="checkbox" class="task-checkbox" ${Number(task.status) === 1 ? 'checked' : ''}>
                             <div class="task-content">
-                                <h2 class="task-title">${task.task_title}</h2>
+                                <h2 class="task-title ${titleClass}">${task.task_title}</h2>
                                 <p class="task-description">${task.task_description}</p>
-                                <div class="task-due-date" id="displayDueDate">
+                                <div class="task-due-date">
                                     <p class="task-due-date-display">${formattedDate}</p>
                                 </div>
                             </div>
                         </div>
                     `);
-                    
+    
                     $('.recycler-view').append(newTask);
+    
+                    var checkbox = newTask.find('.task-checkbox');
+                    var dueDateElement = newTask.find('.task-due-date-display');
+                    var dueDateContainer = newTask.find('.task-due-date');
+    
+                    checkbox.on('change', function () {
+                        if (this.checked) {
+                            dueDateElement.text("DONE!");
+                            dueDateContainer.css({
+                                "background-color": "#41B06E", 
+                                "color": "white"
+                            });
+                        } else {
+                            dueDateElement.text(formattedDate);
+                            dueDateContainer.css({
+                                "background-color": "#EF5A6F", 
+                                "color": "white"
+                            });
+                        }
+                    });
+    
+                    if (checkbox.is(':checked')) {
+                        dueDateElement.text("DONE!");
+                        dueDateContainer.css({
+                            "background-color": "#41B06E",
+                            "color": "white"
+                        });
+                    }
                 });
-
+    
                 checkForTasksAvailable();
                 sortByDate();
-            },
-            error: function (xhr, status, error) {
-                console.error("Failed to load tasks: ", error);
             }
         });
     }

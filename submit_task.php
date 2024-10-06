@@ -13,11 +13,7 @@ if ($isEdit) {
     $stmt = mysqli_prepare($conn, $sql);
     if ($stmt) {
         mysqli_stmt_bind_param($stmt, 'ssssss', $taskTitle, $taskDescription, $taskDueDate, $taskTitle, $taskDescription, $taskDueDate);
-        if (mysqli_stmt_execute($stmt)) {
-            echo json_encode(['success' => true, 'message' => 'Task updated successfully']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Update failed: ' . mysqli_error($conn)]);
-        }
+        mysqli_stmt_execute($stmt);
     }
 } else {
     $sql = "INSERT INTO tasks_information (task_title, task_description, due_date, status) 
@@ -27,13 +23,7 @@ if ($isEdit) {
         mysqli_stmt_bind_param($stmt, 'sss', $taskTitle, $taskDescription, $taskDueDate);
     }
 }
-
-if ($stmt && mysqli_stmt_execute($stmt)) {
-    echo json_encode(['success' => true, 'message' => 'Task saved successfully']);
-} else {
-    echo json_encode(['success' => false, 'message' => 'Task saving failed: ' . mysqli_error($conn)]);
-}
-
+mysqli_stmt_execute($stmt);
 mysqli_stmt_close($stmt);
 mysqli_close($conn);
 

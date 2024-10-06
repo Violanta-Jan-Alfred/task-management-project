@@ -16,10 +16,7 @@ if (isset($_POST['task_title']) && isset($_POST['status'])) {
 
     if ($stmt->execute()) {
         echo "success";
-    } else {
-        echo "error";
     }
-
     $stmt->close();
 }
 

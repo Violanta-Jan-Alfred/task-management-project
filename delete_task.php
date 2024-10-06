@@ -11,10 +11,7 @@ include 'database.php';
 
     if ($stmt->execute()) {
         echo "success";
-    } else {
-        echo "error";
     }
-
     $stmt->close();
 }
 
